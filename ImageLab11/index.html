@@ -1,15 +1,59 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="https://aframe.io/releases/1.7.1/aframe.min.js"> </script>
+    <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-environment-component/dist/aframe-environment-component.min.js"></script>
   </head>
   <body>
     <a-scene>
-      <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
-      <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
-      <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
-      <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
-      <a-sky color="#ECECEC"></a-sky>
+
+      <!-- Step 1: Environment preset (forest, recolored to look snowy) -->
+      <a-entity environment="preset: forest;
+                             groundColor: #f4f8ff;
+                             groundColor2: #dde8f5;
+                             dressingColor: #2f5d50;
+                             skyColor: #b8cde6;
+                             horizonColor: #ffffff;
+                             fog: 0.6"></a-entity>
+
+      <!-- Step 2: Snowman made from A-Frame primitives -->
+      <a-entity id="snowman" position="0 0 -4">
+
+        <!-- Body -->
+        <a-sphere position="0 0.75 0" radius="0.75" color="#ffffff"></a-sphere>
+        <a-sphere position="0 1.85 0" radius="0.55" color="#ffffff"></a-sphere>
+        <a-sphere position="0 2.7 0"  radius="0.4"  color="#ffffff"></a-sphere>
+
+        <!-- Eyes -->
+        <a-sphere position="-0.14 2.8 0.35" radius="0.05" color="#111111"></a-sphere>
+        <a-sphere position="0.14 2.8 0.35"  radius="0.05" color="#111111"></a-sphere>
+
+        <!-- Carrot nose -->
+        <a-cone position="0 2.68 0.5" rotation="90 0 0"
+                radius-bottom="0.07" radius-top="0" height="0.35" color="#ff7a1a"></a-cone>
+
+        <!-- Buttons -->
+        <a-sphere position="0 2.05 0.52" radius="0.06" color="#111111"></a-sphere>
+        <a-sphere position="0 1.8 0.55"  radius="0.06" color="#111111"></a-sphere>
+        <a-sphere position="0 1.55 0.5"  radius="0.06" color="#111111"></a-sphere>
+
+        <!-- Stick arms -->
+        <a-cylinder position="-0.85 2.0 0" rotation="0 0 60"
+                    radius="0.04" height="1" color="#5b3a1e"></a-cylinder>
+        <a-cylinder position="0.85 2.0 0" rotation="0 0 -60"
+                    radius="0.04" height="1" color="#5b3a1e"></a-cylinder>
+
+        <!-- Top hat -->
+        <a-cylinder position="0 3.05 0" radius="0.45" height="0.05" color="#1a1a1a"></a-cylinder>
+        <a-cylinder position="0 3.3 0"  radius="0.28" height="0.5"  color="#1a1a1a"></a-cylinder>
+
+        <!-- Scarf -->
+        <a-torus position="0 2.35 0" rotation="90 0 0"
+                 radius="0.4" radius-tubular="0.07" color="#c62828"></a-torus>
+        <a-box position="0.2 2.05 0.38" rotation="0 0 -10"
+               width="0.15" height="0.5" depth="0.05" color="#c62828"></a-box>
+      </a-entity>
+
     </a-scene>
   </body>
 </html>
