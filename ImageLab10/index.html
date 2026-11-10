@@ -1,15 +1,198 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="https://aframe.io/releases/1.7.1/aframe.min.js"> </script>
+    <title>Unreal Summer World - Lab 10</title>
+    <meta name="description" content="Unreal Summer World in 360 - A-Frame Lab 10">
+    <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
   </head>
   <body>
+    <!-- ===== TEXTURES (drawn with code, so no image files are needed) ===== -->
+    <div style="display:none">
+      <canvas id="sky" width="2048" height="1024"></canvas>
+      <canvas id="sand" width="256" height="256"></canvas>
+      <canvas id="water" width="256" height="256"></canvas>
+      <canvas id="waffle" width="256" height="256"></canvas>
+      <canvas id="strawberry" width="256" height="256"></canvas>
+      <canvas id="mint" width="256" height="256"></canvas>
+      <canvas id="grape" width="256" height="256"></canvas>
+      <canvas id="stripes" width="256" height="256"></canvas>
+      <canvas id="ball" width="256" height="256"></canvas>
+    </div>
+    <script>
+      function ctx(id) { return document.getElementById(id).getContext('2d'); }
+      function speckle(c, n, colors, size) {
+        for (var i = 0; i < n; i++) {
+          c.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+          c.fillRect(Math.random() * 256, Math.random() * 256, size, size);
+        }
+      }
+
+      // --- Unreal 360 sky: purple-pink sunset, two suns, ringed planet, pastel clouds, turquoise sea ---
+      (function () {
+        var c = ctx('sky'), W = 2048, H = 1024;
+        var g = c.createLinearGradient(0, 0, 0, H / 2);
+        g.addColorStop(0, '#28146E'); g.addColorStop(0.6, '#FF78AA'); g.addColorStop(1, '#FFD278');
+        c.fillStyle = g; c.fillRect(0, 0, W, H / 2);
+        var s = c.createLinearGradient(0, H / 2, 0, H);
+        s.addColorStop(0, '#28D2C8'); s.addColorStop(1, '#16566E');
+        c.fillStyle = s; c.fillRect(0, H / 2, W, H / 2);
+        // stars
+        c.fillStyle = '#fff';
+        for (var i = 0; i < 300; i++) c.fillRect(Math.random() * W, Math.pow(Math.random(), 2) * 220, 2, 2);
+        // sun glows + suns
+        [[550, 410, 75, '255,245,170'], [1450, 350, 50, '255,170,225']].forEach(function (sun) {
+          var rg = c.createRadialGradient(sun[0], sun[1], 0, sun[0], sun[1], sun[2] * 4);
+          rg.addColorStop(0, 'rgba(' + sun[3] + ',0.6)'); rg.addColorStop(1, 'rgba(' + sun[3] + ',0)');
+          c.fillStyle = rg; c.fillRect(0, 0, W, H / 2);
+          c.fillStyle = 'rgb(' + sun[3] + ')';
+          c.beginPath(); c.arc(sun[0], sun[1], sun[2], 0, Math.PI * 2); c.fill();
+          // reflection on the sea
+          for (var k = 0; k < 20; k++) {
+            var w = sun[2] - k * 2;
+            c.fillRect(sun[0] - w, H / 2 + 8 + k * 7, w * 2, 2);
+          }
+        });
+        // ringed planet
+        c.fillStyle = '#8CE6FF'; c.beginPath(); c.arc(1800, 180, 50, 0, Math.PI * 2); c.fill();
+        c.strokeStyle = '#fff'; c.lineWidth = 4;
+        c.beginPath(); c.ellipse(1800, 180, 90, 14, 0, 0, Math.PI * 2); c.stroke();
+        // cotton-candy clouds
+        var cloudCols = ['rgba(255,255,255,0.85)', 'rgba(255,200,235,0.85)', 'rgba(200,235,255,0.85)'];
+        for (var n = 0; n < 16; n++) {
+          var cx = Math.random() * W, cy = 120 + Math.random() * 150;
+          c.fillStyle = cloudCols[n % 3];
+          for (var p = 0; p < 6; p++) {
+            c.beginPath();
+            c.ellipse(cx + (Math.random() - 0.5) * 160, cy + (Math.random() - 0.5) * 30,
+                      40 + Math.random() * 40, 25 + Math.random() * 20, 0, 0, Math.PI * 2);
+            c.fill();
+          }
+        }
+        // wave lines
+        c.strokeStyle = 'rgba(255,255,255,0.15)'; c.lineWidth = 2;
+        for (var y = H / 2 + 20; y < H; y += 18) {
+          c.beginPath();
+          for (var x = 0; x <= W; x += 16) c.lineTo(x, y + Math.sin(x / 20 + y) * 4);
+          c.stroke();
+        }
+      })();
+
+      // --- Sand ---
+      (function () {
+        var c = ctx('sand'); c.fillStyle = '#ECCD8C'; c.fillRect(0, 0, 256, 256);
+        speckle(c, 4000, ['#D9B878', '#F5DDA5', '#C9A266', '#B48C5A'], 2);
+      })();
+
+      // --- Water ---
+      (function () {
+        var c = ctx('water'); c.fillStyle = '#28C8D2'; c.fillRect(0, 0, 256, 256);
+        c.strokeStyle = 'rgba(255,255,255,0.35)'; c.lineWidth = 3;
+        for (var y = 8; y < 256; y += 24) {
+          c.beginPath();
+          for (var x = 0; x <= 256; x += 8) c.lineTo(x, y + Math.sin(x / 16) * 5);
+          c.stroke();
+        }
+      })();
+
+      // --- Waffle cone ---
+      (function () {
+        var c = ctx('waffle'); c.fillStyle = '#D69646'; c.fillRect(0, 0, 256, 256);
+        c.strokeStyle = '#A05F23'; c.lineWidth = 6;
+        for (var k = -256; k < 512; k += 32) {
+          c.beginPath(); c.moveTo(k, 0); c.lineTo(k + 256, 256); c.stroke();
+          c.beginPath(); c.moveTo(k, 256); c.lineTo(k + 256, 0); c.stroke();
+        }
+      })();
+
+      // --- Ice cream flavors ---
+      function scoop(id, base, chip) {
+        var c = ctx(id); c.fillStyle = base; c.fillRect(0, 0, 256, 256);
+        speckle(c, 1500, ['rgba(255,255,255,0.25)', 'rgba(0,0,0,0.06)'], 3);
+        c.fillStyle = chip;
+        for (var i = 0; i < 70; i++) {
+          c.beginPath();
+          c.ellipse(Math.random() * 256, Math.random() * 256, 3 + Math.random() * 4, 2, Math.random() * 3, 0, Math.PI * 2);
+          c.fill();
+        }
+      }
+      scoop('strawberry', '#FFA0BE', '#C82850');
+      scoop('mint', '#AAF0C8', '#462814');
+      scoop('grape', '#B48CFF', '#FFFFFF');
+
+      // --- Umbrella stripes ---
+      (function () {
+        var c = ctx('stripes'), cols = ['#FF5078', '#FFFFFF', '#3CC8E6', '#FFFFFF'];
+        for (var i = 0; i < 8; i++) { c.fillStyle = cols[i % 4]; c.fillRect(i * 32, 0, 32, 256); }
+      })();
+
+      // --- Beach ball ---
+      (function () {
+        var c = ctx('ball'), cols = ['#FF3C3C', '#FFFFFF', '#FFD200', '#FFFFFF', '#2878FF', '#FFFFFF'];
+        for (var i = 0; i < 6; i++) { c.fillStyle = cols[i]; c.fillRect(i * 256 / 6, 0, 256 / 6 + 1, 256); }
+      })();
+    </script>
+
+    <!-- ===== THE SCENE ===== -->
     <a-scene>
-      <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
-      <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
-      <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
-      <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
-      <a-sky color="#ECECEC"></a-sky>
+      <!-- Unreal 360 sky -->
+      <a-sky src="#sky" radius="100"></a-sky>
+
+      <!-- Beach (sand) and a moving sea -->
+      <a-circle src="#sand" repeat="12 12" radius="18" rotation="-90 0 0" position="0 0.01 0"></a-circle>
+      <a-plane src="#water" repeat="20 20" width="200" height="200" rotation="-90 0 0" position="0 -0.2 0"
+               animation="property: position; to: 0 -0.06 0; dir: alternate; dur: 2500; loop: true; easing: easeInOutSine"></a-plane>
+
+      <!-- OBJECT 1: Giant triple-scoop ice cream cone (cone + 3 spheres + cherry) -->
+      <a-entity id="ice-cream" position="-4 0 -6"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 20000; easing: linear">
+        <a-cone src="#waffle" repeat="3 2" height="3" radius-bottom="0.05" radius-top="0.9" position="0 1.5 0"></a-cone>
+        <a-sphere src="#strawberry" radius="0.95" position="0 3.3 0"></a-sphere>
+        <a-sphere src="#mint" radius="0.85" position="0 4.6 0"></a-sphere>
+        <a-sphere src="#grape" radius="0.72" position="0 5.75 0"></a-sphere>
+        <a-sphere color="#D7002A" radius="0.2" position="0 6.55 0"></a-sphere>
+        <a-cylinder color="#3A7D2A" radius="0.03" height="0.4" position="0.08 6.8 0" rotation="0 0 -20"></a-cylinder>
+      </a-entity>
+
+      <!-- OBJECT 2: Sandcastle (boxes + cylinder towers + cone roofs + flag) -->
+      <a-entity id="sandcastle" position="3.5 0 -7" rotation="0 -20 0">
+        <a-box src="#sand" repeat="2 1" width="4" height="1.4" depth="3" position="0 0.7 0"></a-box>
+        <a-box src="#sand" width="2" height="1.2" depth="1.6" position="0 2 0"></a-box>
+        <a-box color="#6B4A2B" width="0.6" height="0.8" depth="0.05" position="0 0.4 1.52"></a-box>
+        <a-cylinder src="#sand" radius="0.45" height="2.2" position="-2 1.1 -1.5"></a-cylinder>
+        <a-cylinder src="#sand" radius="0.45" height="2.2" position="2 1.1 -1.5"></a-cylinder>
+        <a-cylinder src="#sand" radius="0.45" height="2.2" position="-2 1.1 1.5"></a-cylinder>
+        <a-cylinder src="#sand" radius="0.45" height="2.2" position="2 1.1 1.5"></a-cylinder>
+        <a-cone src="#sand" radius-bottom="0.55" radius-top="0" height="0.9" position="-2 2.65 -1.5"></a-cone>
+        <a-cone src="#sand" radius-bottom="0.55" radius-top="0" height="0.9" position="2 2.65 -1.5"></a-cone>
+        <a-cone src="#sand" radius-bottom="0.55" radius-top="0" height="0.9" position="-2 2.65 1.5"></a-cone>
+        <a-cone src="#sand" radius-bottom="0.55" radius-top="0" height="0.9" position="2 2.65 1.5"></a-cone>
+        <a-cylinder src="#sand" radius="0.5" height="1.4" position="0 3.3 0"></a-cylinder>
+        <a-cone src="#sand" radius-bottom="0.6" radius-top="0" height="1" position="0 4.5 0"></a-cone>
+        <a-cylinder color="#FFFFFF" radius="0.03" height="1.2" position="0 5.5 0"></a-cylinder>
+        <a-plane color="#FF4F8B" width="0.6" height="0.35" position="0.32 5.9 0" side="double"
+                 animation="property: rotation; from: 0 -15 0; to: 0 15 0; dir: alternate; loop: true; dur: 700"></a-plane>
+      </a-entity>
+
+      <!-- OBJECT 3: Striped beach umbrella + bouncing beach ball -->
+      <a-entity id="umbrella" position="0.5 0 -3.5">
+        <a-cylinder color="#FFFFFF" radius="0.06" height="3" position="0 1.5 0" rotation="0 0 8"></a-cylinder>
+        <a-cone src="#stripes" radius-bottom="1.8" radius-top="0.05" height="0.8" position="-0.2 3.1 0" rotation="0 0 8"
+                animation="property: rotation; to: 0 360 8; loop: true; dur: 12000; easing: linear"></a-cone>
+        <a-box color="#FF9EC4" width="1" height="0.05" depth="1.8" position="1 0.03 0.6" rotation="0 15 0"></a-box>
+      </a-entity>
+      <a-sphere src="#ball" radius="0.4" position="-1 0.4 -2.5"
+                animation="property: position; to: -1 1.6 -2.5; dir: alternate; loop: true; dur: 600; easing: easeOutQuad"
+                animation__spin="property: rotation; to: 0 360 0; loop: true; dur: 3000; easing: linear"></a-sphere>
+
+      <!-- Floating title -->
+      <a-text value="Unreal Summer World" align="center" color="#FFFFFF" width="10" position="0 6.5 -9"></a-text>
+
+      <!-- Lights -->
+      <a-light type="ambient" color="#FFE6F2" intensity="0.8"></a-light>
+      <a-light type="directional" color="#FFF4C2" intensity="0.9" position="-3 6 4"></a-light>
+
+      <!-- Camera at standing height -->
+      <a-entity camera look-controls wasd-controls position="0 1.6 2"></a-entity>
     </a-scene>
   </body>
 </html>
